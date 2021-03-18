@@ -4,7 +4,7 @@
       <Order
           v-for="(order) of orders" :key="order.code"
           v-bind:order="order"
-
+          v-on:remove-order="removeOrder"
       />
     </ul>
   </div>
@@ -16,20 +16,26 @@ import Order from "@/components/Order";
 export default {
   name: "OrderList",
   props: ['orders'],
-  components: {Order}
+  components: {Order},
+  methods:{
+    removeOrder(code){
+      // console.log(id)
+      this.$emit('remove-order', code)
+    }
+  }
 }
 </script>
 
 <style scoped>
 .products-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  /*grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));*/
   grid-gap: 45px;
   width: 80%;
   max-width: 1200px;
   margin: 30px auto;
 }
-.products-element {
+/*.products-element {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -68,5 +74,5 @@ export default {
 .products-element__btn_active {
   border: 1px solid transparent;
   background-image: linear-gradient(to right, #e2f87c, #d6f567, #c8f151, #b9ee38, #a8eb12);
-}
+}*/
 </style>

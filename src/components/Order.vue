@@ -1,21 +1,65 @@
 <template>
-  <li class="products-element">
-    <span class="products-element__name">${name}</span>
-    <img class="products-element__img" src="${img}" />
-    <span class="products-element__price">
-                        ⚡️ ${price.toLocaleString()} USD
-                    </span>
-<!--    <button class="products-element__btn${activeClass}"></button>-->
+  <li class="order-element">
+
+    <span style="margin-left: 25px; width:50px">{{ order.code }}</span>
+    <span style="margin-left: 25px; width:150px; text-align: left">{{ order.name }}</span>
+
+    <template v-if=order.discount>
+      <div class="prices_style_div" style="width: 150px">
+        <p class="products-element__price">{{ fixedPrices(order.price * (1 - order.discount)) }} ₽ </p>
+        <p class="products-element__price price-through">{{ fixedPrices(order.price) }} ₽</p>
+      </div>
+    </template>
+    <template v-else>
+      <div class="prices_style_div" style="width: 150px">
+        <span class="products-element__price">{{ fixedPrices(order.price) }} ₽</span>
+      </div>
+    </template>
+
+    <span style="margin-left: 25px; width:30px; text-align: left">{{ order.count }}</span>
+
+    <button class="product-element-btn" v-on:click="incrCount">+</button>
+    <button class="product-element-btn" v-on:click="decrCount">-</button>
+
+    <template v-if=order.discount>
+      <div class="prices_style_div" style="width: 150px">
+        <p class="products-element__price">{{ fixedPrices(order.price * (1 - order.discount) * order.count) }}
+          ₽ </p>
+        <p class="products-element__price price-through">{{ fixedPrices(order.price * order.count) }} ₽</p>
+      </div>
+    </template>
+    <template v-else>
+      <div class="prices_style_div" style="width: 150px">
+        <span class="products-element__price">{{ fixedPrices(order.price * order.count) }} ₽</span>
+      </div>
+    </template>
+
+    <button class="product-element-btn" v-on:click="$emit('remove-order', order.code)">&times;</button>
+
+
   </li>
 </template>
 
 <script>
 export default {
-name: "Order",
-  props:{
-    product: {
+  name: "Order",
+  props: {
+    order: {
       type: Object,
       required: true
+    }
+  },
+  methods: {
+    incrCount() {
+      this.order.count++;
+    },
+    decrCount() {
+      if (this.order.count > 1) {
+        this.order.count--;
+      }
+    },
+    fixedPrices(value) {
+      return value.toFixed(2)
     }
   }
 }
@@ -23,33 +67,34 @@ name: "Order",
 
 <style scoped>
 
-.products-element {
+.order-element {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: flex-start;
   padding: 25px 20px;
   background-color: #fff;
   border-radius: 3px;
-  box-shadow: 0 16px 24px 2px rgba(33,37,41,.02),
-              0 6px 30px 5px rgba(33,37,41,.04),
-              0 8px 10px -5px rgba(33,37,41,.1);;
+  box-shadow: 0 16px 24px 2px rgba(33, 37, 41, .02),
+  0 6px 30px 5px rgba(33, 37, 41, .04),
+  0 8px 10px -5px rgba(33, 37, 41, .1);;
 }
-.products-element__name {
-  margin-bottom: auto;
-  font-weight: bold;
+
+.prices_style_div {
+  margin-left: 25px;
+  width: 150px;
 }
-.products-element__img {
-  width: 100%;
-  height: 270px;
-  margin-top: 15px;
-  object-fit: contain;
-}
+
 .products-element__price {
   margin-top: 15px;
   color: #808080;
 }
-.products-element__btn {
-  margin-top: 15px;
+
+.price-through {
+  text-decoration: line-through;
+}
+
+.product-element-btn {
+  margin-left: 35px;
   padding: 10px 15px;
   border: 1px solid #808080;
   border-radius: 3px;
@@ -59,8 +104,5 @@ name: "Order",
   font-family: inherit;
   font-size: inherit;
 }
-.products-element__btn_active {
-  border: 1px solid transparent;
-  background-image: linear-gradient(to right, #e2f87c, #d6f567, #c8f151, #b9ee38, #a8eb12);
-}
+
 </style>

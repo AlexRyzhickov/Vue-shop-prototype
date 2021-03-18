@@ -13,11 +13,12 @@
       </template>
 
     </div>
-<!--    class="products-element__btn"-->
-<!--    v-bind:class="{productElementBtn: !isAddInBasket}-->
-<!--    v-bind:class="cravings"-->
+    <!--    class="products-element__btn"-->
+    <!--    v-bind:class="{productElementBtn: !isAddInBasket}-->
+    <!--    v-bind:class="cravings"-->
     <button class="product-element-btn" v-bind:class="{productElementBtnActive: isAddInBasket}"
-    v-on:click="isAddInBasket=!isAddInBasket">Добавить в корзину</button>
+            v-on:click="generateEmmit">{{ getButtonText() }}
+    </button>
   </li>
 </template>
 
@@ -29,13 +30,41 @@ export default {
       type: Object,
       required: true
     },
+    codesOfOrders: {
+      required: true
+    }
   },
-  data(){
+  /*computed: {
+    isAddInBasket: function (){
+      return this.codesOfOrders.includes(this.product.code)
+    }
+  },*/
+  data() {
     return {
       isAddInBasket: false
     }
   },
-  methods: {}
+  methods: {
+    getButtonText() {
+      if (this.isAddInBasket) {
+        return 'Удалить из корзины'
+      } else
+        return 'Добавить в корзину'
+    },
+    generateEmmit() {
+      this.isAddInBasket=!this.isAddInBasket;
+      if (this.isAddInBasket) {
+        this.$emit('add-product', this.product.code)
+        // console.log('add product with code ', this.product.code)
+      } else {
+        this.$emit('remove-product', this.product.code)
+        // console.log('add remove with code ', this.product.code)
+      }
+    }
+  },
+  mounted() {
+    this.isAddInBasket = this.codesOfOrders.includes(this.product.code)
+  }
 }
 </script>
 
@@ -57,7 +86,7 @@ export default {
 .products-element {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding: 25px 20px;
   background-color: #fff;
   border-radius: 3px;
@@ -87,7 +116,7 @@ export default {
   text-decoration: line-through;
 }
 
-.product-element-btn{
+.product-element-btn {
   margin-top: 15px;
   padding: 10px 15px;
   border: 1px solid #808080;
