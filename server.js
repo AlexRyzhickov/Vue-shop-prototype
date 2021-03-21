@@ -17,10 +17,10 @@ app.use(bodyParser.json())
 app.use('/', serveStatic(path.join(__dirname, '/dist')))
 
 function addOrder(code) {
-    let order = products.filter(product => product.code === code)
-    if (!basket.includes(order[0]) && order[0] !== undefined && order[0] !== null) {
-        basket.push(order[0])
-        emmitAddOrder(order[0]);
+    let order = Object.assign({}, products.filter(product => product.code === code)[0])
+    if (!basket.includes(order) && order !== undefined && order !== null) {
+        basket.push(order)
+        emmitAddOrder(order);
     }
 }
 
@@ -45,19 +45,9 @@ io.on('connection', function (socket) {
         socket.emit('testerEvent', {description: 'A custom event named testerEvent!'});
     }, 4000);
 
-    /*socket.on('disconnect', function () {
+    socket.on('disconnect', function () {
         console.log('A user disconnected');
     });
-
-    socket.on('addOrder', function (data){
-        console.log(data)
-    });
-
-    socket.on('removeOrder', function (data){
-        console.log(data)
-    });*/
-
-    // io.emit('newmsg', {message: 'end auction'})
 });
 
 
@@ -76,24 +66,17 @@ app.get('/codesOfOrders', (req, res) => {
 })
 
 app.post('/addOrder', (req, res) => {
-    // console.log('addOrder ', req.body)
-    // basket.push(addOrder(req.body.code)[0])
-    addOrder(addOrder(req.body.code))
-    console.log('addOrder')
-    //console.log(basket)
+    addOrder(req.body.code)
     res.send({ok: true});
 })
 
 app.post('/removeOrder', (req, res) => {
-    // console.log('removeOrder ', req.body)
     basket = basket.filter(order => order.code !== req.body.code)
     emmitRemoveOrder(req.body)
-    console.log(basket)
     res.send({ok: true});
 })
 
 app.post('/incrOrderCount', (req, res) => {
-    console.log('incrOrderCount')
     if (req.body.code !== null && req.body.code !== undefined) {
         for (let order of basket) {
             if (order.code === req.body.code) {
@@ -102,13 +85,11 @@ app.post('/incrOrderCount', (req, res) => {
                 break;
             }
         }
-        console.log(basket)
     }
     res.send({ok: true});
 })
 
 app.post('/decrOrderCount', (req, res) => {
-    console.log('decrOrderCount')
     if (req.body.code !== null && req.body.code !== undefined) {
         for (let order of basket) {
             if (order.code === req.body.code && order.count > 1) {
@@ -117,15 +98,13 @@ app.post('/decrOrderCount', (req, res) => {
                 break;
             }
         }
-        console.log(basket)
     }
     res.send({ok: true});
 })
 
 
 app.get('/getBasket', (req, res) => {
-    console.log('getBasket')
-    console.log(basket.sort(function (a, b) {
+    basket.sort(function (a, b) {
         if (a.code > b.code) {
             return 1;
         }
@@ -134,7 +113,7 @@ app.get('/getBasket', (req, res) => {
         }
         // a должно быть равным b
         return 0;
-    }))
+    })
     res.json(basket)
 })
 
