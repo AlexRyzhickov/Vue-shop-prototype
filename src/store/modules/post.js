@@ -3,34 +3,63 @@ import axios from "axios";
 export default {
     actions: {
         async fetchProducts(ctx) {
-            axios.get('/product')
+            axios.get('http://localhost:3000/product')
                 .then(response => (ctx.commit("updateProducts", response.data)))
         },
+        async fetchBasket(ctx) {
+            axios.get('http://localhost:3000/getBasket')
+                .then(response => {
+                    ctx.commit("updateBasket", response.data);
+                    ctx.commit("updateTotalCost")
+                })
+        },
         async addOrder(ctx, code) {
-            axios.post('/addOrder',
+            axios.post('http://localhost:3000/addOrder',
                 {"code": code}
             )
                 .then(response => {
                     console.log('Add order Success ', response)
+                    ctx.commit("updateTotalCost")
                 })
                 .catch(e => {
                     console.log('Add order Fail ', e)
                 })
         },
         async removeOrder(ctx, code) {
-            axios.post('/removeOrder',
+            axios.post('http://localhost:3000/removeOrder',
                 {"code": code}
             )
                 .then(response => {
                     console.log('Remove order Success ', response)
+                    ctx.commit("updateTotalCost")
                 })
                 .catch(e => {
                     console.log('Remove order Fail ', e)
                 })
         },
-        async fetchBasket(ctx) {
-            axios.get('/getBasket')
-                .then(response => (ctx.commit("updateBasket", response.data)))
+        async incrOrderCount(ctx, code) {
+            axios.post('http://localhost:3000/incrOrderCount',
+                {"code": code}
+            )
+                .then(response => {
+                    console.log('Remove order Success ', response)
+                    ctx.commit("updateTotalCost")
+                })
+                .catch(e => {
+                    console.log('Remove order Fail ', e)
+                })
+        },
+        async decrOrderCount(ctx, code) {
+            axios.post('http://localhost:3000/decrOrderCount',
+                {"code": code}
+            )
+                .then(response => {
+                    console.log('Remove order Success ', response)
+                    ctx.commit("updateTotalCost")
+                })
+                .catch(e => {
+                    console.log('Remove order Fail ', e)
+                })
         }
     },
     mutations: {
@@ -39,6 +68,37 @@ export default {
         },
         updateBasket(state, basket) {
             state.basket = basket
+        },
+        updateTotalCost(state) {
+            state.totalCost = 0
+            for (let order of state.basket) {
+                state.totalCost += order.price * (1 - order.discount) * order.count
+            }
+        },
+        addOrderMutation(state, add_order) {
+            if (!state.basket.includes(add_order)) {
+                state.basket.push(add_order)
+                state.basket.sort(function (a, b) {
+                    if (a.code > b.code) {
+                        return 1;
+                    }
+                    if (a.code < b.code) {
+                        return -1;
+                    }
+                    return 0;
+                })
+            }
+        },
+        removeOrderMutation(state, remove_order) {
+            state.basket = state.basket.filter(order => order.code !== remove_order.code)
+        },
+        changeOrderMutation(state, change_order) {
+            for (let order of state.basket) {
+                if (order.code === change_order.code) {
+                    order.count = change_order.count;
+                    break;
+                }
+            }
         }
     },
     state: {
@@ -61,7 +121,8 @@ export default {
             {code: 6, name: 'SKOGSFRÄKEN СКОГСФРЭКЕН', price: 899, count: 1, discount: 0, img: ''},
             {code: 7, name: 'VILDKORN ВИЛЬДКОРН', price: 399, count: 1, discount: 0, img: ''},
             {code: 8, name: 'VALBJÖRG ВАЛЬБЬЁРГ', price: 199, count: 1, discount: 0, img: ''},*!/
-        ]*/
+        ]*/,
+        totalCost: 0
     },
     getters: {
         getProducts(state) {
@@ -69,6 +130,12 @@ export default {
         },
         getBasket(state) {
             return state.basket
+        },
+        getCodesOfOrders(state) {
+            return state.basket.map(order => order.code)
+        },
+        getTotalCost(state) {
+            return state.totalCost.toFixed(2)
         }
     }
 }

@@ -3,7 +3,7 @@
     <router-link to="/basket">Basket</router-link>
     <ProductList
         v-bind:products="getProducts"
-        v-bind:basket="getBasket"
+        v-bind:codesOfOrders="getCodesOfOrders"
         v-on:add-product="addProductInBasket"
         v-on:remove-product="removeProductInBasket"
     />
@@ -18,19 +18,10 @@ export default {
   name: "Shop",
   components: {ProductList},
   computed: {
-    ...mapGetters(['getProducts', 'getBasket']),
-    reversedMessage: function () {
-      let codesOfProducts = this.products.filter(product => product.code)
-      console.log(codesOfProducts)
-      let codesOfOrders = this.basket.filter(order => order.code)
-      console.log(codesOfOrders)
-      return true
-    }
-
+    ...mapGetters(['getProducts', 'getCodesOfOrders'])
   },
   methods: {
-    ...mapActions(['fetchProducts', "addOrder", "removeOrder"]),
-
+    ...mapActions(['fetchProducts', "fetchBasket", "addOrder", "removeOrder"]),
     addProductInBasket(code) {
       console.log('add product with code ', code)
       this.addOrder(code)

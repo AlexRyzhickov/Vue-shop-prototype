@@ -5,7 +5,7 @@
       <Product
           v-for="(product) of products" :key="product.code"
           v-bind:product="product"
-          v-bind:codesOfOrders="getCodeOfOrsers"
+          v-bind:codesOfOrders="codesOfOrders"
           v-on:add-product="addProduct"
           v-on:remove-product="removeProduct"
       />
@@ -18,13 +18,13 @@ import Product from "@/components/Product";
 
 export default {
   name: "ProductList",
-  props: ['products', 'basket'],
+  props: ['products', 'codesOfOrders'],
   components: {Product},
-  computed: {
+  /*computed: {
     getCodeOfOrsers() {
       return this.basket.map(order => order.code)
     }
-  },
+  },*/
   methods: {
     addProduct(code) {
       this.$emit('add-product', code)

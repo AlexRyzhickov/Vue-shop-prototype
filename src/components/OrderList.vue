@@ -1,12 +1,20 @@
 <template>
-  <div>
-    <ul>
+  <div class="elements_container">
+    <ul class="orders-container">
       <Order
           v-for="(order) of orders" :key="order.code"
           v-bind:order="order"
           v-on:remove-order="removeOrder"
+          v-on:incr-order-count="incrOrderCount"
+          v-on:decr-order-count="decrOrderCount"
       />
     </ul>
+    <div style="margin-top: 20px; margin-right: 45px; align-items: flex-start">
+      <span>Номер заказа: 2159886</span>
+      <hr>
+      <p>Сумма заказа {{totalCost}} ₽</p>
+      <hr>
+    </div>
   </div>
 </template>
 
@@ -15,26 +23,59 @@ import Order from "@/components/Order";
 
 export default {
   name: "OrderList",
-  props: ['orders'],
+  props: ['orders','totalCost'],
   components: {Order},
-  methods:{
-    removeOrder(code){
+  // data(){
+  //   return{
+  //     totalCost: 0
+  //   }
+  // }
+  /*,
+  watch :{
+   totalCost(value){
+     console.log(value)
+   },
+    orders(value){
+
+    }
+  }*/
+  /*watch: {
+    orders(value){
+      console.log(value)
+    }
+  }*/
+  methods: {
+    removeOrder(code) {
       // console.log(id)
       this.$emit('remove-order', code)
+      //this.totalCost++
+    },
+    incrOrderCount(code) {
+      this.$emit('incr-order-count', code)
+      //this.totalCost++
+    },
+    decrOrderCount(code) {
+      this.$emit('decr-order-count', code)
+      //this.totalCost++
     }
   }
 }
 </script>
 
 <style scoped>
-.products-container {
+.orders-container {
   display: grid;
   /*grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));*/
   grid-gap: 45px;
-  width: 80%;
-  max-width: 1200px;
+  width: 60%;
+  max-width: 1000px;
   margin: 30px auto;
 }
+
+.elements_container {
+  display: flex;
+}
+
 /*.products-element {
   display: flex;
   flex-direction: column;
